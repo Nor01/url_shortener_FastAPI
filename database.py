@@ -1,17 +1,13 @@
-import mysql.connector
-from mysql.connector import Error
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-def create_connection(host_name, user_name, user_pass):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_pass
-        )
-    except Error as e:
-        print(f"The error '{e}' ocurred.")
+from .config import get_settings
 
-    return connection
-
-connection = create_connection("localhost", "root", "")
+engine = create_engine(
+    get_settings().db_url, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine
+)
+Base = declarative_base()
